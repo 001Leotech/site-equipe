@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Equipe Acadêmica</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    header { background: #2a9d8f; color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 20px; }
+    main { display: flex; flex-direction: column; gap: 20px; }
+
+    #login-area, #cadastro-area, #dashboard { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    #cadastro-area { background: #fafafa; }
+
+    h2, h3 { color: #264653; margin-bottom: 10px; }
+    form input, form button {
+      width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc;
+    }
+    form button { background: #2a9d8f; color: white; border: none; cursor: pointer; }
+    form button:hover { background: #21867a; }
+
+    #dashboard { display: none; grid-template-columns: 200px 1fr; gap: 20px; position: relative; }
+    #membros-lista { background: #fff; border-right: 1px solid #ddd; padding: 10px; }
+    #membros-lista ul { list-style: none; padding-left: 0; }
+    #membros-lista li { margin: 5px 0; }
+
+    #conteudo-principal { display: flex; flex-direction: column; gap: 20px; }
+    #chat-top { background: #f1f1f1; padding: 10px; border-radius: 5px; height: 120px; overflow-y: auto; }
+    #chat-form input { width: 80%; display: inline-block; }
+    #chat-form button { width: 18%; float: right; }
+
+    #feed { background: #fff; padding: 10px; border-radius: 5px; }
+    .feed-post { margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+
+    .hidden { display: none; }
+
+    #logout-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      background-color: #e76f51;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #logout-btn:hover {
+      background-color: #d1533f;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><i class="fas fa-users"></i> Equipe de Trabalho Acadêmico</h1>
+  </header>
+
+  <main>
+    <section id="login-area">
+      <h2>Login de Membro</h2>
+      <form id="login-form">
+        <input type="text" id="login-nome" placeholder="Nome" required>
+        <input type="password" id="login-senha" placeholder="Senha" required>
+        <button type="submit">Entrar</button>
+      </form>
+    </section>
+
+    <section id="cadastro-area">
+      <h2>Cadastro (caso ainda não tenha conta)</h2>
+      <form id="cadastro-form">
+        <input type="text" id="cadastro-nome" placeholder="Nome para cadastro" required>
+        <input type="password" id="cadastro-senha" placeholder="Senha" required>
+        <button type="submit">Cadastrar</button>
+      </form>
+    </section>
+
+    <section id="dashboard">
+      <button id="logout-btn">Sair</button>
+      <aside id="membros-lista">
+        <h3>Membros</h3>
+        <ul id="membros"></ul>
+      </aside>
+      <div id="conteudo-principal">
+        <div id="chat">
+          <h3>Bate-Papo</h3>
+          <div id="chat-top"></div>
+          <form id="chat-form">
+            <input type="text" id="chat-msg" placeholder="Mensagem..." required />
+            <button type="submit">Enviar</button>
+          </form>
+        </div>
+
+        <div id="feed">
+          <h3>Feed de Atualizações</h3>
+          <form id="feed-form">
+            <input type="text" id="feed-msg" placeholder="Nova atualização..." required />
+            <button type="submit">Postar</button>
+          </form>
+          <div id="feed-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const membros = [];
+    let membroLogado = '';
+
+    // Cadastro
+    document.getElementById('cadastro-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const nome = document.getElementById('cadastro-nome').value;
+      const senha = document.getElementById('cadastro-senha').value;
+      if (nome && senha) {
+        membros.push({ nome, senha });
+        alert('Cadastro realizado com sucesso! Agora faça login.');
+        this.reset();
+      }
+    });
+
+    // Login
+    document.getElementById('login-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const nome = document.getElementById('login-nome').value;
+      const senha = document.getElementById('login-senha').value;
+      const membro = membros.find(m => m.nome === nome && m.senha === senha);
+      if (membro) {
+        membroLogado = nome;
+        document.getElementById('login-area').style.display = 'none';
+        document.getElementById('cadastro-area').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'grid';
+        atualizarMembros();
+      } else {
+        alert('Nome ou senha incorretos.');
+      }
+    });
+
+    // Logout
+    document.getElementById('logout-btn').addEventListener('click', function () {
+      membroLogado = '';
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('login-area').style.display = 'block';
+      document.getElementById('cadastro-area').style.display = 'block';
+    });
+
+    // Atualizar lista de membros
+    function atualizarMembros() {
+      const ul = document.getElementById('membros');
+      ul.innerHTML = '';
+      membros.forEach(m => {
+        const li = document.createElement('li');
+        li.textContent = m.nome;
+        ul.appendChild(li);
+      });
+    }
+
+    // Feed
+    document.getElementById('feed-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const msg = document.getElementById('feed-msg').value;
+      const div = document.createElement('div');
+      div.classList.add('feed-post');
+      div.innerHTML = `<strong>${membroLogado}</strong>: ${msg}`;
+      document.getElementById('feed-list').prepend(div);
+      this.reset();
+    });
+
+    // Chat
+    document.getElementById('chat-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const msg = document.getElementById('chat-msg').value;
+      const div = document.createElement('div');
+      div.classList.add('chat-msg');
+      div.innerHTML = `<strong>${membroLogado}</strong>: ${msg}`;
+      document.getElementById('chat-top').appendChild(div);
+      document.getElementById('chat-top').scrollTop = document.getElementById('chat-top').scrollHeight;
+      this.reset();
+    });
+  </script>
+</body>
+</html>
