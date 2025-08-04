@@ -7,32 +7,33 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
-    header { background: #2a9d8f; color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 20px; }
+    body { font-family: 'Segoe UI', sans-serif; background: #1c1c1c; padding: 20px; color: #f0f0f0; }
+    header { background: #fdd835; color: black; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 0 10px #ffeb3b; }
     main { display: flex; flex-direction: column; gap: 20px; }
 
-    #login-area, #cadastro-area, #dashboard { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    #cadastro-area { background: #fafafa; }
+    #login-area, #cadastro-area, #dashboard { background: #2a2a2a; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(255,255,255,0.1); }
+    #cadastro-area { background: #333; }
 
-    h2, h3 { color: #264653; margin-bottom: 10px; }
-    form input, form button {
-      width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc;
+    h2, h3 { color: #fdd835; margin-bottom: 10px; }
+    form input, form select, form button {
+      width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #555;
+      background-color: #111; color: #f0f0f0;
     }
-    form button { background: #2a9d8f; color: white; border: none; cursor: pointer; }
-    form button:hover { background: #21867a; }
+    form button { background: #fdd835; color: black; border: none; cursor: pointer; font-weight: bold; }
+    form button:hover { background: #fff176; }
 
     #dashboard { display: none; grid-template-columns: 200px 1fr; gap: 20px; position: relative; }
-    #membros-lista { background: #fff; border-right: 1px solid #ddd; padding: 10px; }
+    #membros-lista { background: #1e1e1e; border-right: 1px solid #555; padding: 10px; border-radius: 10px; }
     #membros-lista ul { list-style: none; padding-left: 0; }
-    #membros-lista li { margin: 5px 0; }
+    #membros-lista li { margin: 5px 0; color: #f0f0f0; }
 
     #conteudo-principal { display: flex; flex-direction: column; gap: 20px; }
-    #chat-top { background: #f1f1f1; padding: 10px; border-radius: 5px; height: 120px; overflow-y: auto; }
+    #chat-top { background: #444; padding: 10px; border-radius: 5px; height: 120px; overflow-y: auto; }
     #chat-form input { width: 80%; display: inline-block; }
     #chat-form button { width: 18%; float: right; }
 
-    #feed { background: #fff; padding: 10px; border-radius: 5px; }
-    .feed-post { margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+    #feed { background: #1e1e1e; padding: 10px; border-radius: 5px; }
+    .feed-post { margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 5px; color: #fff; }
 
     .hidden { display: none; }
 
@@ -41,14 +42,14 @@
       top: 10px;
       right: 10px;
       padding: 5px 10px;
-      background-color: #e76f51;
+      background-color: #f44336;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
     #logout-btn:hover {
-      background-color: #d1533f;
+      background-color: #d32f2f;
     }
 
     #preview-area img {
@@ -75,7 +76,7 @@
     <section id="cadastro-area">
       <h2>Cadastro (caso ainda não tenha conta)</h2>
       <form id="cadastro-form">
-        <input type="text" id="cadastro-nome" placeholder="Nome para cadastro" required>
+        <input type="text" id="cadastro-nome" placeholder="Nome do membro" required>
         <input type="password" id="cadastro-senha" placeholder="Senha" required>
         <button type="submit">Cadastrar</button>
       </form>
@@ -115,19 +116,15 @@
     const membros = [];
     let membroLogado = '';
 
-    // Cadastro
     document.getElementById('cadastro-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const nome = document.getElementById('cadastro-nome').value;
       const senha = document.getElementById('cadastro-senha').value;
-      if (nome && senha) {
-        membros.push({ nome, senha });
-        alert('Cadastro realizado com sucesso! Agora faça login.');
-        this.reset();
-      }
+      membros.push({ nome, senha });
+      alert('Membro cadastrado com sucesso! Faça login.');
+      this.reset();
     });
 
-    // Login
     document.getElementById('login-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const nome = document.getElementById('login-nome').value;
@@ -144,7 +141,6 @@
       }
     });
 
-    // Logout
     document.getElementById('logout-btn').addEventListener('click', function () {
       membroLogado = '';
       document.getElementById('dashboard').style.display = 'none';
@@ -152,7 +148,6 @@
       document.getElementById('cadastro-area').style.display = 'block';
     });
 
-    // Atualizar lista de membros
     function atualizarMembros() {
       const ul = document.getElementById('membros');
       ul.innerHTML = '';
@@ -163,7 +158,6 @@
       });
     }
 
-    // Feed com preview
     const fileInput = document.getElementById('feed-arquivo');
     const previewArea = document.getElementById('preview-area');
 
@@ -214,7 +208,6 @@
       previewArea.innerHTML = '';
     });
 
-    // Chat
     document.getElementById('chat-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const msg = document.getElementById('chat-msg').value;
